@@ -1,8 +1,29 @@
 const API_URL = "https://fullstacktest-production-e929.up.railway.app";
 
-// Beim Laden der Seite: alle Produkte abrufen
+// Prüfen ob eingeloggt — wenn nicht, zu Login weiterleiten
+const token = localStorage.getItem("token");
+if (!token) {
+  window.location.href = "./login.html";
+}
+
+// Eingeloggten Benutzer anzeigen
+const user = JSON.parse(localStorage.getItem("user"));
+if (user) {
+  document.getElementById("username").textContent = `Hallo, ${user.name}`;
+}
+
+// Logout
+document.getElementById("logout").addEventListener("click", () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+  window.location.href = "./login.html";
+});
+
+// Alle Produkte laden
 async function loadProducts() {
-  const response = await fetch(`${API_URL}/api/products`);
+  const response = await fetch(`${API_URL}/api/products`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   const products = await response.json();
 
   const list = document.getElementById("product-list");
@@ -14,20 +35,22 @@ async function loadProducts() {
   });
 }
 
-// Formular abschicken: neues Produkt erstellen
+// Neues Produkt erstellen
 document.getElementById("product-form").addEventListener("submit", async (e) => {
-  e.preventDefault(); // verhindert dass die Seite neu lädt
+  e.preventDefault();
 
   const name = document.getElementById("name").value;
   const price = document.getElementById("price").value;
 
   await fetch(`${API_URL}/api/products`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify({ name, price: parseFloat(price) }),
   });
 
-  // Formular leeren und Liste neu laden
   document.getElementById("product-form").reset();
   loadProducts();
 });
