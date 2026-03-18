@@ -3,8 +3,23 @@ const cors = require("cors");
 const db = require("./database");
 const authRoutes = require("./auth");
 const authenticate = require("./middleware");
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
 
 const app = express();
+app.use(helmet());
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+});
+app.use(limiter); 
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
