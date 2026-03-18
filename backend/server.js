@@ -18,11 +18,19 @@ const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
 });
-app.use(limiter); 
+app.use(limiter);
+
+const allowedOrigins = ["http://localhost:3000", "http://localhost:5173", process.env.FRONTEND_URL];
 
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS nicht erlaubt"));
+      }
+    },
   })
 );
 
