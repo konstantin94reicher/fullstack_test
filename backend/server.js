@@ -77,7 +77,7 @@ app.post("/api/products", authenticate, async (req, res) => {
 });
 
 // PUT Produkt aktualisieren
-app.put("/api/products/:id", async (req, res) => {
+app.put("/api/products/:id", authenticate, async (req, res) => {
   const { name, price } = req.body;
   try {
     const result = await db.query("UPDATE products SET name = $1, price = $2 WHERE id = $3 RETURNING *", [name, price, req.params.id]);

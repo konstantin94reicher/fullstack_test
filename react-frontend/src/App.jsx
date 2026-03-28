@@ -13,6 +13,17 @@ function App() {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user"));
 
+  // Bei abgelaufenem/ungültigem Token ausloggen
+  function handleAuthError(response) {
+    if (response.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/login");
+      return true;
+    }
+    return false;
+  }
+
   // Wenn nicht eingeloggt, zu Login weiterleiten
   useEffect(() => {
     if (!token) {
@@ -28,6 +39,7 @@ function App() {
         const response = await fetch(`${API_URL}/api/products`, {
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (handleAuthError(response)) return;
         const data = await response.json();
         setProdukte(data);
       } catch (err) {
@@ -50,6 +62,7 @@ function App() {
         },
         body: JSON.stringify(neuesProdukt),
       });
+      if (handleAuthError(response)) return;
       const data = await response.json();
       setProdukte([...produkte, data]);
     } catch (err) {

@@ -19,11 +19,23 @@ document.getElementById("logout").addEventListener("click", () => {
   window.location.href = "./login.html";
 });
 
+// Bei abgelaufenem/ungültigem Token ausloggen
+function handleAuthError(response) {
+  if (response.status === 401) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "./login.html";
+    return true;
+  }
+  return false;
+}
+
 // Alle Produkte laden
 async function loadProducts() {
   const response = await fetch(`${API_URL}/api/products`, {
     headers: { Authorization: `Bearer ${token}` },
   });
+  if (handleAuthError(response)) return;
   const products = await response.json();
 
   const list = document.getElementById("product-list");
@@ -42,7 +54,7 @@ document.getElementById("product-form").addEventListener("submit", async (e) => 
   const name = document.getElementById("name").value;
   const price = document.getElementById("price").value;
 
-  await fetch(`${API_URL}/api/products`, {
+  const response = await fetch(`${API_URL}/api/products`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -50,6 +62,7 @@ document.getElementById("product-form").addEventListener("submit", async (e) => 
     },
     body: JSON.stringify({ name, price: parseFloat(price) }),
   });
+  if (handleAuthError(response)) return;
 
   document.getElementById("product-form").reset();
   loadProducts();

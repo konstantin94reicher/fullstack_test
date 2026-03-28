@@ -15,6 +15,9 @@ function authenticate(req, res, next) {
     req.user = user; // Benutzer-Infos werden dem Request hinzugefügt
     next(); // weiter zur eigentlichen Route
   } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ error: "Token abgelaufen" });
+    }
     res.status(401).json({ error: "Ungültiges Token" });
   }
 }

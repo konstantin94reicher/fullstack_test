@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/konstantinreicher/programmieren/backend/fullstack_test -maxdepth 3 -not -path */node_modules/* -type f -o -type d)"
+    ]
+  }
+}
