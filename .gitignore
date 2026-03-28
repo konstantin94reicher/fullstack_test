@@ -4,3 +4,4 @@ node_modules
 shop.db
 
 .env
+.claude/
